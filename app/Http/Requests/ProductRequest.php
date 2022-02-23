@@ -46,11 +46,12 @@ class ProductRequest extends FormRequest
     {
         return [
             'category_id' => 'required',
+            'brand_id' => 'required',
             'name' => 'required',
             'description' => 'required|max:3000',
             'content' => 'required',
-            'quantity' => 'required|integer',
             'price' => 'required|integer',
+            'retail_price' => 'required|integer',
             'status' => 'required'
         ];
     }

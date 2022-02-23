@@ -71,15 +71,10 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        try {
-            $response = $this->productRepository->store($request->all());
-        } catch (\Throwable $th) {
-            return response()->json([
-                'data' => ['errors' => ['exception' => $th->getMessage()]]
-            ], 400);
-        }
-        $jsonSetting = new ProductResource($response);
-        return $jsonSetting;
+        $product = $this->productRepository->create($request->all());
+        $jsonProduct = new ProductResource($product);
+
+        return $jsonProduct;
     }
 
     /**

@@ -21,7 +21,7 @@ class CreateProductsTable extends Migration
             ->on('categories')
             ->onDelete('cascade');
 
-            $table->unsignedBigInteger('brand_id');
+            $table->integer('brand_id');
             $table->string('name');
             $table->integer('price');
             $table->integer('retail_price');

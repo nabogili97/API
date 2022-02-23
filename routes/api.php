@@ -175,7 +175,8 @@ Route::get('listProductDetails', [ProductDetailController::class, 'join']);
 Route::get( 'productLists', [ProductController::class, 'productLists']);
 Route::get('productLists/category/{id}', [ProductController::class, 'productByCategory']);
 Route::get( 'productLists/brand/{id}', [ProductController::class, 'productByBrand']);
-Route::get('productLists/color/{id}', [ProductController::class, 'productByColor']);
+Route::get( 'productLists/color/{id}', [ProductController::class, 'productByColor']);
+Route::get('productShow/{id}', [ProductController::class, 'productShow']);
 
 Route::get('product/show/{id}', [ProductController::class, 'productShow']);
 

@@ -44,8 +44,8 @@ class ProductRepository extends BaseRepository
         $conditions = $this->getSearchConditions($params);
         $conditionsFormated = [];
 
-        if (isset($conditions['title'])) {
-            $conditionsFormated[] = ['title', 'like', '%' . $params['title'] . '%'];
+        if (isset($conditions['name'])) {
+            $conditionsFormated[] = ['name', 'like', '%' . $params['name'] . '%'];
         }
 
         if (isset($conditions['public_start_at'])) {
@@ -69,15 +69,17 @@ class ProductRepository extends BaseRepository
         }
 
         if (isset($conditions['sortBy'])) {
-            $this->orderBy($params['sortBy'], $params['sortType'] == 1 ? 'desc' : 'asc');
+            $this->orderBy($params['sortBy'], $params['sortType'] == 1 ? 'asc' : 'desc');
         }
+        
 
         $columns = [
             "category_id",
             "name",
             "description",
-            "quantity",
+            "qty",
             "viewed",
+            "retail_price",
             "image",
             "status",
         ];
@@ -86,7 +88,8 @@ class ProductRepository extends BaseRepository
             array_push($columns, 'content');
         }
         $params['conditions'] = $conditionsFormated;
-        $params['limit'] = 15;
+        $params['sortBy'] = 'id';
+        $params['limit'] = 10;
         $result = $this->searchByParams($params);
 
         return $result;
