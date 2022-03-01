@@ -21,7 +21,12 @@ use App\Http\Controllers\SizeController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\ProductDetailController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\UploadController;
 use App\Models\Post;
+use App\Http\Controllers\FileController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ShoppingCartController;
+use App\Http\Controllers\CartController;
 
 /*
 |--------------------------------------------------------------------------
@@ -151,6 +156,7 @@ Route::post('brand/store', [BrandController::class, 'store']);
 Route::put('brand/update/{id}', [BrandController::class, 'update']);
 Route::delete('brand/destroy/{id}', [BrandController::class, 'destroy']);
 Route::get('brands', [BrandController::class, 'index']);
+Route::get('brand/show/{id}', [BrandController::class, 'show']);
 
 //Route Size
 Route::post('size/store', [SizeController::class, 'store']);
@@ -187,3 +193,32 @@ Route::put('posts/updateStatus/{id}', [PostController::class, 'updateStatus']);
 Route::put('posts/update/{id}', [PostController::class, 'update']);
 Route::delete('posts/destroy/{id}', [PostController::class, 'destroy']);
 Route::get('posts', [PostController::class, 'index']);
+
+//Upload image
+Route::post('/upload-image', [UploadController::class, 'image']);
+
+Route::post('/upload', [FileController::class, 'upload']);
+
+
+// Cart 
+Route::post('carts/store', [ShoppingCartController::class, 'store']);
+Route::post('carts', [ShoppingCartController::class, 'store']);
+Route::put('carts/update/{id}', [ShoppingCartController::class, 'update']);
+Route::delete('carts/destroy/{id}', [ShoppingCartController::class, 'destroy']);
+Route::get('carts', [ShoppingCartController::class, 'index']);
+
+// Cart 
+Route::get('/', [ProductController::class, 'productList'])->name('products.list');
+Route::get('cart', [CartController::class, 'cartList'])->name('cart.list');
+Route::post('update-cart', [CartController::class, 'updateCart'])->name('cart.update');
+Route::post('remove', [CartController::class, 'removeCart'])->name('cart.remove');
+Route::post('clear', [CartController::class, 'clearAllCart'])->name('cart.clear');
+
+
+Route::post('cart', [CartController::class, 'addToCart']);
+Route::get('cart', [CartController::class, 'cartList']);
+Route::get('checkout/get/items', [CartController::class, 'getCartItemsForCheckout']);
+
+//Customer
+Route::get('purchase', [CustomerController::class, 'purchase']);
+

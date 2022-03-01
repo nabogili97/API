@@ -144,7 +144,7 @@ class BrandController extends Controller
     public function destroy($id)
     {
         try {
-            $result = $this->categoryRepository->delete($id);
+            $result = $this->brandRepository->delete($id);
         } catch (\Throwable $th) {
             return response()->json([
                 'data' => ['errors' => ['exception' => $th->getMessage()]]

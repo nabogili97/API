@@ -68,7 +68,7 @@ class ProductSeeder extends Seeder
         $product->category_id = 1;
         $product->brand_id = 2;
         $product->price = 10000000;
-        $product->retail_price = 1500000;
+        $product->retail_price = 15000000;
         $product->image = "https://xcimg.szwego.com/20211018/i1634486548_8531_0.jpg";
         $product->description = "Thiết kế lạ mắt";
         $product->content = "content .......";
@@ -80,7 +80,7 @@ class ProductSeeder extends Seeder
         $product->category_id = 2;
         $product->brand_id = 1;
         $product->price = 10000000;
-        $product->retail_price = 1500000;
+        $product->retail_price = 15000000;
         $product->image = "https://xcimg.szwego.com/o_1f6epphoqoimvpdjulfef5kudd.jpg";
         $product->description = "Thiết kế lạ mắt";
         $product->content = "content .......";
@@ -92,7 +92,7 @@ class ProductSeeder extends Seeder
         $product->category_id = 2;
         $product->brand_id = 1;
         $product->price = 15000000;
-        $product->retail_price = 2000000;
+        $product->retail_price = 20000000;
         $product->image = "https://xcimg.szwego.com/o_1f6epi66d5rteuq1alu1fqi10eja9.jpg";
         $product->description = "Thiết kế lạ mắt";
         $product->content = "content .......";

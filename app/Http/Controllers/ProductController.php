@@ -71,9 +71,14 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        $product = $this->productRepository->create($request->all());
-        $jsonProduct = new ProductResource($product);
-
+       try {
+            $response = $this->productRepository->store($request->all());
+        } catch (\Throwable $th) {
+            return response()->json([
+                'data' => ['errors' => ['exception' => $th->getMessage()]]
+            ], 400);
+        }
+        $jsonProduct = new ProductResource($response);
         return $jsonProduct;
     }
 
@@ -103,10 +108,10 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(ProductRequest $request, $id)
+    public function update(Request $request, $id)
     {
         try {
-            $response = $this->productRepository->updateProduct($request->all(), $id);
+            $response = $this->productRepository->update($request->all(), $id);
         } catch (\Throwable $th) {
             return response()->json([
                 'data' => ['errors' => ['exception' => $th->getMessage()]]
@@ -212,6 +217,27 @@ class ProductController extends Controller
 
         return response()->json($data);
     }
+
+    // public function upload(Request $request)
+    // {
+
+    //     $request->validate([
+    //         'file' => 'required|mimes:jpg,jpeg,png,csv,txt,xlx,xls,pdf|max:2048'
+    //     ]);
+
+    //     $fileUpload = new Product;
+
+    //     if ($request->file()) {
+    //         $file_name = time() . '_' . $request->file->getClientOriginalName();
+    //         $file_path = $request->file('file')->storeAs('uploads', $file_name, 'public');
+
+    //         $fileUpload->name = time() . '_' . $request->file->getClientOriginalName();
+    //         $fileUpload->path = '/storage/' . $file_path;
+    //         $fileUpload->save();
+
+    //         return response()->json(['success' => 'File uploaded successfully.']);
+    //     }
+    // }
 
 
 }

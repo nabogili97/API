@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     use HasFactory;
+    protected $guarded = [];
 
     const STATUS_PRODUCT_ENABLED = 1;
     const STATUS_PRODUCT_DISABLE = 0;

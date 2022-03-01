@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Keyword;
 use App\Models\Post;
+use App\Models\Customer;
 use App\Models\ProductDetail;
 use Illuminate\Database\Seeder;
 
@@ -16,6 +17,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        Customer::factory()->count(5)->create();
         $this->call([
             UserSeeder::class,
             CategorySeeder::class,

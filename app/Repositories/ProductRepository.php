@@ -69,8 +69,9 @@ class ProductRepository extends BaseRepository
         }
 
         if (isset($conditions['sortBy'])) {
-            $this->orderBy($params['sortBy'], $params['sortType'] == 1 ? 'asc' : 'desc');
+            $this->orderBy($params['sortBy'], $params['sortType'] == 1 ? 'desc' : 'asc');
         }
+        
         
 
         $columns = [
@@ -88,8 +89,8 @@ class ProductRepository extends BaseRepository
             array_push($columns, 'content');
         }
         $params['conditions'] = $conditionsFormated;
-        $params['sortBy'] = 'id';
-        $params['limit'] = 10;
+        $params['sortBy'] = 'desc';
+        $params['limit'] = 20;
         $result = $this->searchByParams($params);
 
         return $result;
@@ -106,7 +107,6 @@ class ProductRepository extends BaseRepository
     {
         $file = $params['image'];
         $nameFile = Carbon::now()->timestamp . $file->getClientOriginalName();
-
         Storage::putFileAs('public/product/img', $file, $nameFile);
         $url = config('app.url') . '/storage/product/img/' . $nameFile;
         $params['image'] = $url;
@@ -138,5 +138,7 @@ class ProductRepository extends BaseRepository
     public function listPro() {
         
     }
+
+    
 
 }

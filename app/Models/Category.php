@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     use HasFactory;
+    protected $guarded = [];
     const CATEGORY_ENABLED = 1;
     const CATEGORY_STATUS_DISABLE = 0;
     /**
@@ -19,4 +20,9 @@ class Category extends Model
         'name',
         'status',
     ];
+
+    public function products() 
+    {
+        return $this->belongsToMany(Product::class);
+    }
 }
