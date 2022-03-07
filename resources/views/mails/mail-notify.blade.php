@@ -1,31 +1,23 @@
-<div>
-   <!-- <h2>{{ $data['type'] }}</h2> -->
-   <span>Adminさん</span>
+<!DOCTYPE html>
+<html>
 
+<head>
+   <title>Page Title</title>
+</head>
+
+<body>
+   <h4>The Cuong - Luxury</h4>
    <p>
-      比較アイテムシステムからのメッセーです。
+      <b>Họ và tên: </b>&#160;&#160;<span>{{$details['name']}}</span>
    </p>
-
    <p>
-      お客様からメッセージをいただきました。
+      <b>Email: </b>&#160;&#160;<span>{{$details['email']}}</span>
    </p>
-
    <p>
-      メッセージの内容は下記の通りです。
+      <b>Số điện thoại: </b>&#160;&#160;<span>{{$details['phone']}}</span>
    </p>
+   <p><b>Nội dung: </b></p>
+   <p> &#160; &#160; &#160; &#160;{{$details['message']}}</p>
+</body>
 
-   <p>■名前: {{ $data['name'] }}</p>
-   <p>company: {{ $data['company'] }}</p>
-   <p>■電話番号：{{ $data['phone'] }}</p>
-   <p>category: {{ $data['category'] }}</p>
-   <p>email: {{ $data['email'] }}</p>
-   <p>type: {{ $data['type'] }}</p>
-   <p>■詳細の内容：</p>
-   <div style="margin-left: 10px">{!! $data['content'] !!}</div>
-   <br>
-   <br>
-
-   システムの自動メッセージです。返事しないでお願いいたします。
-   <hr>
-   <p style="text-align:center">比較アイテム</p>
-</div>
+</html>

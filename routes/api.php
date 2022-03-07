@@ -47,6 +47,13 @@ use App\Http\Controllers\CartController;
 // Route Auth
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
+Route::get('auth/user', [AuthController::class, 'user']);
+
+Route::group(['middleware' => 'jwt.auth'], function () {
+    
+});
+
+
 
 Route::group(['middleware' => 'jwt.verify'], function () {
 
@@ -130,6 +137,8 @@ Route::get('keywords', [KeywordController::class, 'index']);
 
 //Route Send mail
 Route::get('send/mail-contact', [SendMailContactController::class, 'sendMailContact']);
+
+Route::post('mail-contact', [SendMailContactController::class, 'send']);
 
 //Route slide
 Route::get('slides', [SlideController::class, 'index']);
@@ -218,6 +227,7 @@ Route::post('clear', [CartController::class, 'clearAllCart'])->name('cart.clear'
 Route::post('cart', [CartController::class, 'addToCart']);
 Route::get('cart', [CartController::class, 'cartList']);
 Route::get('checkout/get/items', [CartController::class, 'getCartItemsForCheckout']);
+Route::post('payment', [CartController::class, 'payment']);
 
 //Customer
 Route::get('purchase', [CustomerController::class, 'purchase']);

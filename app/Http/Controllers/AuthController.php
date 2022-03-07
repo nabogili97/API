@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Http\Requests\Auth\LoginRequest;
 use Carbon\Carbon;
+use App\Models\User;
 
 class AuthController extends Controller
 {
@@ -27,20 +28,51 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
 
-        $credentials = $request->only('email', 'password');
+        // $credentials = $request->only('email', 'password');
         // $token = JWTAuth::attempt($credentials, ['exp' => Carbon::now()->addYears(10)->timestamp]);
-        try {
-            if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'invalid_credentials'], 400);
-            }
-        } catch (\Tymon\JWTAuth\Exceptions\JWTException $ex) {
-            return response()->json(['error', 'could_not_create_token', 500]);
+        // try {
+        //     if (!$token = JWTAuth::attempt($credentials)) {
+        //         return response()->json(['error' => 'invalid_credentials'], 400);
+        //     }
+        // } catch (\Tymon\JWTAuth\Exceptions\JWTException $ex) {
+        //     return response()->json(['error', 'could_not_create_token', 500]);
+        // }
+        // $user = Auth::user();
+        // $user->token = $token;
+        // $jsonUser = new UserResource($user);
+
+        // return $jsonUser;
+
+        $credentials = $request->only('email', 'password');
+        if (!$token = JWTAuth::attempt($credentials)) {
+            return response([
+                'status' => 'error',
+                'error' => 'invalid.credentials',
+                'msg' => 'Invalid Credentials.'
+            ], 400);
         }
         $user = Auth::user();
         $user->token = $token;
         $jsonUser = new UserResource($user);
+        return response([
+            'status' => 'Đăng nhập thành công'
+        ])
+        ->header('Authorization', $token);
 
-        return $jsonUser;
+
+        
+
+        
+
+        // if(Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        //     return response()->json([
+        //         'message' => 'Dang nhap thanh cong'
+        //     ]);
+        // }else {
+        //     return response()->json([
+        //         'message' => 'Tài khoản hoặc mật khẩu không đúng',
+        //     ], 401);
+        // }
     }
 
     public function register(UserRequest $request)
@@ -112,5 +144,23 @@ class AuthController extends Controller
         $jsonUser = new UserResource($user);
 
         return $jsonUser;
+    }
+
+    public function user(Request $request)
+    {
+
+        $user = JWTAuth::user();
+        if (count((array)$user) > 0) {
+            return response()->json(['status' => 'success', 'user' => $user]);
+        } else {
+            return response()->json(['status' => 'fail'], 401);
+        }
+    }
+
+    public function refresh()
+    {
+        return response([
+            'status' => 'success'
+        ]);
     }
 }

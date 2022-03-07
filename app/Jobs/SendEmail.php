@@ -35,6 +35,6 @@ class SendEmail implements ShouldQueue
      */
     public function handle()
     {
-        MAIL::to($this->user->email)->send(new MailNotify($this->data));
+        Mail::to($this->user->email)->send(new MailNotify($this->data));
     }
 }

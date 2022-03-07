@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Order;
+use App\Models\Payment;
+use App\Models\User;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,7 +21,6 @@ class CartController extends Controller
 
     public function addToCart(Request $request)
     {
-        
 
 
         $product = Product::find($request->get('product_id'));
@@ -122,6 +123,7 @@ class CartController extends Controller
     public function store(Request $request)
     {
 
+        $userItems = Order::where('user_id', auth()->id)->sum('quantity');
 
         $product = Product::find($request->input('product_id'));
 
@@ -197,6 +199,36 @@ class CartController extends Controller
             }
         }
         return response()->json($finalData);
+    }
+
+    public function payment(Request $request) 
+    {
+        $name = $request->get('name');
+        $phone = $request->get('phone');
+        $address = $request->get('address');
+        $email = $request->get('email');
+        $amount = $request->get('amount');
+        $orders = $request->get('order');
+        $user_id = 1;
+
+        $paymentDetail = Payment::create([
+            'user_id'=> $user_id,
+            'name' => $name,
+            'phone' => $phone,
+            'address' => $address,
+            'email' => $email,
+            'amount' => $amount,
+            'order_details' => json_encode($orders), 
+        ]);
+
+
+        if( $paymentDetail )
+        {
+            Order::where('user_id', $user_id)->delete();
+        }
+
+        return response()->json($paymentDetail);
+
     }
     
 }

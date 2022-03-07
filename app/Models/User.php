@@ -18,7 +18,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array
      */
-    protected $table = 'products';
+    protected $table = 'users';
     protected $primaryKey = 'id';
     protected $fillable = [
         'name',

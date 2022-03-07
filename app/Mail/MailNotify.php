@@ -11,16 +11,16 @@ class MailNotify extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $data;
+    public $details;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($data)
+    public function __construct($details)
     {
-       $this->data = $data;
+       $this->details = $details;
     }
 
     /**
@@ -30,8 +30,7 @@ class MailNotify extends Mailable
      */
     public function build()
     {
-        return $this->from('compare.item.ngocuong691@gmail.com')
-        ->view('mails.mail-notify')
-        ->subject('test mail');
+        return $this->from($this->details['email'])
+        ->view('mails.mail-notify')->subject('📫 Mail của khách hàng trên The Cuong - Luxury !!! 📧');
     }
 }
