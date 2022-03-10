@@ -40,24 +40,58 @@ class AuthController extends Controller
         // $user = Auth::user();
         // $user->token = $token;
         // $jsonUser = new UserResource($user);
-
         // return $jsonUser;
 
-        $credentials = $request->only('email', 'password');
-        if (!$token = JWTAuth::attempt($credentials)) {
-            return response([
-                'status' => 'error',
-                'error' => 'invalid.credentials',
-                'msg' => 'Invalid Credentials.'
-            ], 400);
+       
+
+        if (!$token = JWTAuth::attempt($request->only(['email', 'password']))) {
+            return response()->json([
+                'errors' => [
+                    'email' => ['There is something wrong! We could not verify details']
+                ]
+            ], 422);
         }
-        $user = Auth::user();
-        $user->token = $token;
-        $jsonUser = new UserResource($user);
-        return response([
-            'status' => 'Đăng nhập thành công'
-        ])
-        ->header('Authorization', $token);
+
+        return (new UserResource($request->user()))
+        ->additional([
+            'meta' => [
+                'token' => $token
+            ]
+        ]);
+
+
+
+
+        // $credentials = $request->only('email', 'password');
+        // if (!$token = JWTAuth::attempt($credentials)) {
+        //     return response([
+        //         'status' => 'error',
+        //         'error' => 'invalid.credentials',
+        //         'msg' => 'Invalid Credentials.'
+        //     ], 400);
+        // }
+        // return response([
+        //     'status' => 'success'
+        // ])
+        // ->header('Authorization', $token);
+
+   
+
+
+        // $credentials = $request->only('email', 'password');
+        // if (!$token = Auth::attempt($credentials)) {
+        //     return response([
+        //         'status' => 'error',
+        //         'error' => 'invalid.credentials',
+        //         'msg' => 'Invalid Credentials.'
+        //     ], 400);
+        // }
+        // $user = Auth::user();
+        // $user->token = $token;
+        // $jsonUser = new UserResource($user);
+        // return response([
+        //     'status' => 'success'
+        // ])->header('Authorization', $token);
 
 
         
@@ -75,19 +109,53 @@ class AuthController extends Controller
         // }
     }
 
-    public function register(UserRequest $request)
+    // public function register(UserRequest $request)
+    // {
+
+    //     $userRequest =  $request->all();
+    //     $userRequest['password'] = Hash::make($request->password);
+
+    //     $user = $this->userRepository->create($userRequest);
+    //     $token = JWTAuth::fromUser($user);
+    //     $user->token = $token;
+    //     $jsonUser = new UserResource($user);
+
+    //     return $jsonUser;
+    // }
+
+    public function register(Request $request)
     {
+        // validate dữ liệu
+        $this->validate($request, [
+            'name' => 'required',
+            'email' => 'required|unique:users,email|email',
+            'password' => 'required'
+        ]);
 
-        $userRequest =  $request->all();
-        $userRequest['password'] = Hash::make($request->password);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'sex' => $request->sex,
+            'address' => $request->address,
+            'status' => 1,
+            'role' => 0,
+            'password' => bcrypt($request->password)
+        ]);
 
-        $user = $this->userRepository->create($userRequest);
-        $token = JWTAuth::fromUser($user);
-        $user->token = $token;
-        $jsonUser = new UserResource($user);
-
-        return $jsonUser;
+        // sau khi lưu dữ liệu user mới vào CSDL, tiến hành đăng nhập luôn rồi trả về token đăng nhập
+        if (!$token = JWTAuth::attempt($request->only(['email', 'password', 'phone', 'address', 'sex', 'status', 'role']))) {
+            return abort(401);
+        }
+        return (new UserResource($user))
+            ->additional([
+                'meta' => [
+                    'token' => $token
+                ]
+        ]);
     }
+
+
 
     // public function permission()
     // {
@@ -113,7 +181,6 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
-
         try {
             JWTAuth::invalidate(JWTAuth::getToken());
             return response()->json(null, 204);
@@ -146,15 +213,28 @@ class AuthController extends Controller
         return $jsonUser;
     }
 
-    public function user(Request $request)
-    {
+    // public function user(Request $request)
+    // {
 
-        $user = JWTAuth::user();
-        if (count((array)$user) > 0) {
-            return response()->json(['status' => 'success', 'user' => $user]);
-        } else {
-            return response()->json(['status' => 'fail'], 401);
-        }
+    //     $user = JWTAuth::user();
+    //     if (count((array)$user) > 0) {
+    //         return response()->json(['status' => 'success', 'user' => $user]);
+    //     } else {
+    //         return response()->json(['status' => 'fail'], 401);
+    //     }
+
+    //     // $user = User::find(JWTAuth::user()->id);
+    //     // return response()->json([
+    //     //     'status' => 'success',
+    //     //     'data' => $user
+    //     // ]);
+    // }
+
+    public function user()
+    {
+        return [
+            'data' => JWTAuth::parseToken()->authenticate()
+        ];
     }
 
     public function refresh()

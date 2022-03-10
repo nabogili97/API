@@ -42,9 +42,10 @@ return [
         ],
 
         'api' => [
-            'driver' => 'token',
+            // sửa lại như này
+            // 'driver' => 'api',
+            'driver' => 'jwt',
             'provider' => 'users',
-            'hash' => false,
         ],
     ],
 

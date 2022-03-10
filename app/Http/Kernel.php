@@ -3,6 +3,8 @@
 namespace App\Http;
 
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
+use App\Http\Middleware\JWTCheckToken;
+use App\Http\Middleware\JwtMiddleware;
 
 class Kernel extends HttpKernel
 {
@@ -21,6 +23,8 @@ class Kernel extends HttpKernel
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        // 'jwtnew' => JWTCheckToken::class,
+        // 'testJWT' => JwtMiddleware::class,
     ];
 
     /**
@@ -65,5 +69,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'jwt.verify' => \App\Http\Middleware\JwtMiddleware::class,
         'cors' => \App\Http\Middleware\Cors::class,
+        'jwt.auth' => \Tymon\JWTAuth\Middleware\GetUserFromToken::class,
+        'jwt.refresh' => \Tymon\JWTAuth\Middleware\RefreshToken::class,
     ];
 }

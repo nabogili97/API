@@ -21,6 +21,7 @@ class CreatePaymentsTable extends Migration
             $table->string('phone');
             $table->longText('order_details');
             $table->double('amount');
+            $table->tinyInteger('status');
             $table->timestamps();
         });
     }

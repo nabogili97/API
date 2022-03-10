@@ -14,6 +14,7 @@ class Payment extends Model
         'phone',
         'order_details',
         'amount',
-        'user_id'
+        'user_id',
+        'status'
     ];
 }

@@ -27,6 +27,8 @@ use App\Http\Controllers\FileController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ShoppingCartController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,18 +49,34 @@ use App\Http\Controllers\CartController;
 // Route Auth
 Route::post('auth/login', [AuthController::class, 'login']);
 Route::post('auth/register', [AuthController::class, 'register']);
+Route::get('auth/logout', [AuthController::class, 'logout']);
+// Route::get('auth/user', [AuthController::class, 'user']);
+
+// Route::group(['middleware' => ['auth']], function () {
+//     Route::get('auth/user', [AuthController::class, 'user']);
+// });
+
+// Route::group([
+//     'middleware' => 'testJWT',
+//     'prefix' => 'auth'
+// ], function ($router) {
+//     Route::get('auth/user', [AuthController::class, 'user']);
+// });
+
 Route::get('auth/user', [AuthController::class, 'user']);
 
-Route::group(['middleware' => 'jwt.auth'], function () {
-    
+// Route::group(['middleware' => 'jwtnew'], function () {
+//     Route::get('auth/user', [AuthController::class, 'user']);
+// });
+Route::group(['middleware' => 'jwt.verify'], function () {
+    Route::get('auth/refresh', 'AuthController@refresh');
 });
 
 
-
 Route::group(['middleware' => 'jwt.verify'], function () {
-
+    // Route::get('auth/user', [AuthController::class, 'user']);
     // Route Auth
-    Route::get('auth/logout', [AuthController::class, 'logout']);
+    
     Route::put('auth/changePassword/{id}', [AuthController::class, 'changePassword']);
 
     // Route Dashboard
@@ -228,7 +246,12 @@ Route::post('cart', [CartController::class, 'addToCart']);
 Route::get('cart', [CartController::class, 'cartList']);
 Route::get('checkout/get/items', [CartController::class, 'getCartItemsForCheckout']);
 Route::post('payment', [CartController::class, 'payment']);
+Route::delete('removeItemOrder/{id}', [OrderController::class, 'removeItemOrder']);
 
 //Customer
 Route::get('purchase', [CustomerController::class, 'purchase']);
+
+
+//Order
+Route::get('orderList', [OrderController::class, 'listOrder']);
 

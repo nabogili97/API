@@ -12,27 +12,25 @@ use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
+
     public function cartList()
     {
         $cartItems = Order::getContent();
-        // dd($cartItems);
         return view('cart', compact('cartItems'));
     }
 
     public function addToCart(Request $request)
     {
-
-
         $product = Product::find($request->get('product_id'));
 
         $productFoundInCart =  Order::where('product_id', $request->get('product_id'))->pluck('id');
 
         //check user cart items
-        $userItems = Order::where('user_id', 1)->sum('quantity');
+        $userItems = Order::where('user_id', ($request->get('user_id')))->sum('quantity');
 
         if (!$request->get('product_id')) {
             return [
-                'message' => 'Cập nhật giỏ hàng thành công ',
+                'message' => 'Cập nhật giỏ hàng không thành công ',
                 'items' => $userItems
             ];
         }
@@ -44,7 +42,7 @@ class CartController extends Controller
                 'product_id' => $product->id,
                 'quantity' => 1,
                 'price' => $product->retail_price,
-                'user_id' => 1,
+                'user_id' => $request->get('user_id'),
             ]);
        } 
        else 
@@ -162,7 +160,8 @@ class CartController extends Controller
     // }
 
     public function getCartItemsForCheckout() 
-    {
+    {   
+        
         $cartItems =  Order::with('product')->where('user_id', 1)->get();
         $finalData = [];
         $amount = 0;
@@ -210,6 +209,7 @@ class CartController extends Controller
         $amount = $request->get('amount');
         $orders = $request->get('order');
         $user_id = 1;
+        $status = 0;
 
         $paymentDetail = Payment::create([
             'user_id'=> $user_id,
@@ -218,6 +218,7 @@ class CartController extends Controller
             'address' => $address,
             'email' => $email,
             'amount' => $amount,
+            'status' => $status,
             'order_details' => json_encode($orders), 
         ]);
 
@@ -229,6 +230,25 @@ class CartController extends Controller
 
         return response()->json($paymentDetail);
 
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function removeItemOrder($id)
+    {
+        try {
+            $result = $this->colorRepository->delete($id);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'data' => ['errors' => ['exception' => $th->getMessage()]]
+            ], 400);
+        }
+
+        return response($result);
     }
     
 }

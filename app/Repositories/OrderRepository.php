@@ -30,8 +30,8 @@ class OrderRepository extends BaseRepository
         $conditions = $this->getSearchConditions($params);
         $conditionsFormated = [];
 
-        if (isset($conditions['color_value'])) {
-            $conditionsFormated[] = ['color_value', 'like', '%' . $params['color_value'] . '%'];
+        if (isset($conditions['product_id'])) {
+            $conditionsFormated[] = ['product_id', 'like', '%' . $params['product_id'] . '%'];
         }
 
         $params['sortBy'] = 'id';
