@@ -21,6 +21,7 @@ class CartController extends Controller
 
     public function addToCart(Request $request)
     {
+
         $product = Product::find($request->get('product_id'));
 
         $productFoundInCart =  Order::where('product_id', $request->get('product_id'))->pluck('id');
@@ -159,10 +160,9 @@ class CartController extends Controller
     //     return response()->json(['cart' => $cart], 200);
     // }
 
-    public function getCartItemsForCheckout() 
+    public function getCartItemsForCheckout(Request $request) 
     {   
-        
-        $cartItems =  Order::with('product')->where('user_id', 1)->get();
+        $cartItems =  Order::with('product')->where('user_id',1 )->get();
         $finalData = [];
         $amount = 0;
 
@@ -247,7 +247,6 @@ class CartController extends Controller
                 'data' => ['errors' => ['exception' => $th->getMessage()]]
             ], 400);
         }
-
         return response($result);
     }
     

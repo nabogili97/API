@@ -26,6 +26,7 @@ class CreateProductsTable extends Migration
             $table->integer('price');
             $table->integer('retail_price');
             $table->string('image');
+            $table->integer('qty');
             $table->string('description', 3000);
             $table->text('content');
             $table->tinyInteger('status');

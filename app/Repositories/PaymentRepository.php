@@ -30,8 +30,12 @@ class PaymentRepository extends BaseRepository
         $conditions = $this->getSearchConditions($params);
         $conditionsFormated = [];
 
-        if (isset($conditions['size_value'])) {
-            $conditionsFormated[] = ['size_value', 'like', '%' . $params['size_value'] . '%'];
+        if (isset($conditions['name'])) {
+            $conditionsFormated[] = ['name', 'like', '%' . $params['name'] . '%'];
+        }
+
+        if (isset($conditions['phone'])) {
+            $conditionsFormated[] = ['phone', 'like', '%' . $params['phone'] . '%'];
         }
 
         $params['sortBy'] = 'id';

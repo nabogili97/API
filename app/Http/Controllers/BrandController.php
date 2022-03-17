@@ -7,6 +7,9 @@ use App\Http\Resources\BrandResource;
 use App\Http\Requests\BrandRequest;
 use App\Models\Brand;
 use Illuminate\Http\Request;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class BrandController extends Controller
 {
@@ -64,13 +67,45 @@ class BrandController extends Controller
      * @param  \App\Http\Requests\Category\CategoryRequest  $request
      * @return \Illuminate\Http\Response
      */
+    // public function store(BrandRequest $request)
+    // {
+    //     $brand = $this->brandRepository->create($request->all());
+    //     $jsonBrand= new BrandResource($brand);
+
+    //     return $jsonBrand;
+    // }
+
     public function store(BrandRequest $request)
     {
-        $brand = $this->brandRepository->create($request->all());
-        $jsonBrand= new BrandResource($brand);
+        $brand = new Brand;
+        $brand->name = $request->name;
+        $brand->status = $request->status;
+        if($request->image){ 
+            $image = $request->image;
+            $extension = $image->getClientOriginalExtension();
+            $name = 'brand/images/'. $image->getClientOriginalName();
 
-        return $jsonBrand;
+            $target_dir    = "brand/images/";
+            $target_file   = $target_dir . basename($_FILES["image"]["name"]);
+
+            $brand->image = $target_file;
+
+            if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                echo "File " . basename($_FILES["image"]["name"]) .
+                " Đã upload thành công.";
+
+                echo "File lưu tại " .
+                $target_file;
+            }
+
+            
+            $brand->image = $name;
+        }else {
+            $brand->image = 'defaul.jpg';
+        }
+        $brand->save();
     }
+
 
     /**
      * Display the specified resource.
@@ -101,16 +136,30 @@ class BrandController extends Controller
      */
     public function update(Request $request, $id)
     {
-        try {
-            $brand = $this->brandRepository->update($request->all(), $id);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'data' => ['errors' => ['exception' => $th->getMessage()]]
-            ], 400);
-        }
-        $jsonBrand = new BrandResource($brand);
+        $brand = Brand::find($id);
+        $brand->name = $request->name;
+        $brand->status = $request->status;
+        if ($request->image) {
+            $image = $request->image;
+            $extension = $image->getClientOriginalExtension();
+            $name = 'brand/images/' . $image->getClientOriginalName();
 
-        return $jsonBrand;
+            $target_dir    = "brand/images/";
+            $target_file   = $target_dir . basename($_FILES["image"]["name"]);
+
+            $brand->image = $target_file;
+
+            if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                echo "File " . basename($_FILES["image"]["name"]) .
+                " Đã upload thành công.";
+
+                echo "File lưu tại " .
+                $target_file;
+            }
+            
+            $brand->image = $name;
+        }
+        $brand->save();
     }
 
 

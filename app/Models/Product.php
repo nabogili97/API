@@ -25,6 +25,7 @@ class Product extends Model
         "retail_price",
         "image",
         "price",
+        "qty",
         "status",
     ];
 
@@ -46,6 +47,11 @@ class Product extends Model
     public function orders()
     {
         return $this->belongsToMany(Order::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany('\App\Models\Comment');
     }
 
 }

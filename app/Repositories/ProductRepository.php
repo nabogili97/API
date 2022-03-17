@@ -48,6 +48,10 @@ class ProductRepository extends BaseRepository
             $conditionsFormated[] = ['name', 'like', '%' . $params['name'] . '%'];
         }
 
+        if (isset($conditions['brand_id'])) {
+            $conditionsFormated[] = ['brand_id', 'like', '%' . $params['brand_id'] . '%'];
+        }
+
         if (isset($conditions['public_start_at'])) {
             $conditionsFormated[] = ['public_start_at', '>=', $params['public_start_at']];
         }
@@ -76,6 +80,7 @@ class ProductRepository extends BaseRepository
 
         $columns = [
             "category_id",
+            "brand_id",
             "name",
             "description",
             "qty",
@@ -89,8 +94,10 @@ class ProductRepository extends BaseRepository
             array_push($columns, 'content');
         }
         $params['conditions'] = $conditionsFormated;
-        $params['sortBy'] = 'desc';
-        $params['limit'] = 20;
+        $params['sortBy'] = 'id';
+        $params['sortType'] =  'desc';
+        $this->orderBy($params['sortBy'], $params['sortType']);
+        $params['limit'] = 12;
         $result = $this->searchByParams($params);
 
         return $result;
@@ -107,7 +114,7 @@ class ProductRepository extends BaseRepository
     {
         $file = $params['image'];
         $nameFile = Carbon::now()->timestamp . $file->getClientOriginalName();
-        Storage::putFileAs('public/product/img', $file, $nameFile);
+        Storage::putFileAs('public/product/image', $file, $nameFile);
         $url = config('app.url') . '/storage/product/img/' . $nameFile;
         $params['image'] = $url;
         return $this->create($params);
@@ -126,7 +133,7 @@ class ProductRepository extends BaseRepository
             $file = $params['image'];
             $nameFile = Carbon::now()->timestamp . $file->getClientOriginalName();
 
-            Storage::putFileAs('public/product/img', $file, $nameFile);
+            Storage::putFileAs('public/product/images', $file, $nameFile);
             $url = config('app.url') . '/storage/product/img/' . $nameFile;
             $params['image'] = $url;
 

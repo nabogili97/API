@@ -19,9 +19,9 @@ class UserSeeder extends Seeder
             'name' => 'Ngô Thế Cường',
             'email' => 'admin@gmail.com',
             'phone' => '0326966656',
-            'address' => 'Ha Noi',
-            'role' => rand(0, 1),
-            'sex' => rand(0, 1),
+            'address' => 'Tổ 5, Quang Minh, Mê Linh, Hà Nội',
+            'role' => 2,
+            'sex' => 0,
             'password' => Hash::make('12345678'),
             'status' => 1
         ]);
@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
             'email' => 'user@gmail.com',
             'phone' => '0326966656',
             'address' => 'Ha Noi',
-            'role' => rand(0, 1),
+            'role' => 1,
             'sex' => rand(0, 1),
             'password' => Hash::make('12345678'),
             'status' => 1

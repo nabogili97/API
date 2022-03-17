@@ -16,13 +16,11 @@ class CreatePostsTable extends Migration
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->integer('category_id');
             $table->string('title');
             $table->text('content');
-            $table->unsignedBigInteger('viewed')->default(0);
             $table->date('public_start_at');
             $table->date('public_end_at');
-            $table->string('img');
+            $table->string('image');
             $table->string('description', 3000);
             $table->tinyInteger('status');
             $table->timestamps();

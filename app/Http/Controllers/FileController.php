@@ -25,8 +25,8 @@ class FileController extends Controller
         $fileUpload = new Product;
 
         if ($request->file()) {
-            $file = time() . '_' . $request->file->getClientOriginalName();
-            $file_path = $request->file('file')->storeAs('product', $file, 'public');
+            $file = $request->file->getClientOriginalName();
+            $file_path = $request->file('file')->storeAs('product/img', $file, 'public');
             $fileUpload->category_id = $request->category_id;
             $fileUpload->name = $request->name;
             $fileUpload->brand_id = $request->brand_id;
@@ -34,14 +34,64 @@ class FileController extends Controller
             $fileUpload->retail_price = $request->retail_price;
             $fileUpload->description = $request->description;
             $fileUpload->content = $request->content;
+            $fileUpload->qty = $request->qty;
             $fileUpload->status = $request->status;
 
-            $fileUpload->image = '/storage/' . $file_path;
+            $target_dir    = "product/images/";
+            $target_file   = $target_dir . basename($_FILES["file"]["name"]);
 
-            // // $files  = Storage::putFile('file', $request->file('file'));
-            // Storage::putFile('file', new File('/product/img'), 'public');
+            $fileUpload->image = $target_file;
+
+            if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
+                echo "File " . basename($_FILES["file"]["name"]) .
+                " Đã upload thành công.";
+
+                echo "File lưu tại " .
+                $target_file;
+            }
 
             $fileUpload->save();
+
+            return response()->json(['success' => 'File uploaded successfully.']);
+        }
+    }
+
+    public function upadte(Request $request, $id)
+    {
+
+        $request->validate([
+            'file' => 'required|mimes:jpg,jpeg,png,csv,txt,xlx,xls,pdf|max:2048'
+        ]);
+
+        $product = Product::find($id);
+
+        if ($request->file()) {
+            $file = $request->file->getClientOriginalName();
+            $file_path = $request->file('file')->storeAs('product/img', $file, 'public');
+            $product->category_id = $request->category_id;
+            $product->name = $request->name;
+            $product->brand_id = $request->brand_id;
+            $product->price = $request->price;
+            $product->retail_price = $request->retail_price;
+            $product->description = $request->description;
+            $product->content = $request->content;
+            $product->qty = $request->qty;
+            $product->status = $request->status;
+
+            $target_dir    = "product/images/";
+            $target_file   = $target_dir . basename($_FILES["file"]["name"]);
+
+            $product->image = $target_file;
+
+            if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
+                echo "File " . basename($_FILES["file"]["name"]) .
+                " Đã upload thành công.";
+
+                echo "File lưu tại " .
+                $target_file;
+            }
+
+            $product->save();
 
             return response()->json(['success' => 'File uploaded successfully.']);
         }

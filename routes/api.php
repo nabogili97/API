@@ -28,6 +28,8 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ShoppingCartController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\CommentController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -120,11 +122,11 @@ Route::group(['middleware' => 'jwt.verify'], function () {
 
 });
 // Route Post
-Route::get('posts/listPost', [PostController::class, 'listPost']);
-Route::get('posts/getListPopular', [PostController::class, 'getListPopular']);
-Route::get('posts/getListNew', [PostController::class, 'getListNew']);
-Route::get('posts/show/{id}', [PostController::class, 'show']);
-Route::get('posts/getListRadom', [PostController::class, 'getListRadom']);
+// Route::get('posts/listPost', [PostController::class, 'listPost']);
+// Route::get('posts/getListPopular', [PostController::class, 'getListPopular']);
+// Route::get('posts/getListNew', [PostController::class, 'getListNew']);
+// Route::get('posts/show/{id}', [PostController::class, 'show']);
+// Route::get('posts/getListRadom', [PostController::class, 'getListRadom']);
 
 // Route Product
 Route::get('product/listProduct', [ProductController::class, 'listProduct']);
@@ -215,11 +217,12 @@ Route::get('product/show/{id}', [ProductController::class, 'productShow']);
 
 
 // Post
-Route::post('posts/store', [PostController::class, 'store']);
-Route::put('posts/updateStatus/{id}', [PostController::class, 'updateStatus']);
-Route::put('posts/update/{id}', [PostController::class, 'update']);
-Route::delete('posts/destroy/{id}', [PostController::class, 'destroy']);
+Route::post('post/store', [PostController::class, 'store']);
+Route::put('post/updateStatus/{id}', [PostController::class, 'updateStatus']);
+Route::put('post/update/{id}', [PostController::class, 'update']);
+Route::delete('post/destroy/{id}', [PostController::class, 'destroy']);
 Route::get('posts', [PostController::class, 'index']);
+Route::get('post/show/{id}', [PostController::class, 'show']);
 
 //Upload image
 Route::post('/upload-image', [UploadController::class, 'image']);
@@ -255,3 +258,16 @@ Route::get('purchase', [CustomerController::class, 'purchase']);
 //Order
 Route::get('orderList', [OrderController::class, 'listOrder']);
 
+//Comment
+Route::post('comment/store', [CommentController::class, 'store']);
+Route::get('comments', [CommentController::class, 'list']);
+Route::put('comment/update/{id}', [CommentController::class, 'update']);
+Route::delete('comment/destroy/{id}', [CommentController::class, 'destroy']);
+
+
+
+//Payment
+Route::get('payments', [PaymentController::class, 'index']);
+Route::put('payment/update/{id}', [PaymentController::class, 'update']);
+Route::delete('payment/destroy/{id}', [PaymentController::class, 'destroy']);
+Route::get('payment/show/{id}', [PaymentController::class, 'show']);

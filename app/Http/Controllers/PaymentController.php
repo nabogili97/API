@@ -101,13 +101,13 @@ class PaymentController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $size = $this->sizeRepository->update($request->all(), $id);
+            $payment = $this->paymentRepository->update($request->all(), $id);
         } catch (\Throwable $th) {
             return response()->json([
                 'data' => ['errors' => ['exception' => $th->getMessage()]]
             ], 400);
         }
-        $jsonPayment = new PaymentResoure($size);
+        $jsonPayment = new PaymentResoure($payment);
 
         return $jsonPayment;
     }

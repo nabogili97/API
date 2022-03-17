@@ -19,14 +19,12 @@ class Post extends Model
      * @var array
      */
     protected $fillable = [
-        'category_id',
         'title',
         'status',
         'content',
         'public_start_at',
         'public_end_at',
-        'viewed',
-        'img',
+        'image',
         'description'
     ];
 }

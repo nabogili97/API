@@ -110,15 +110,36 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        try {
-            $response = $this->productRepository->update($request->all(), $id);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'data' => ['errors' => ['exception' => $th->getMessage()]]
-            ], 400);
+        $product = Product::find($id);
+        $product->name = $request->name;
+        $product->category_id = $request->category_id;
+        $product->brand_id = $request->brand_id;
+        $product->price = $request->price;
+        $product->qty = $request->qty;
+        $product->retail_price = $request->retail_price;
+        $product->description = $request->description;
+        $product->content = $request->content;
+        $product->status = $request->status;
+        if ($request->image) {
+            $image = $request->image;
+            $extension = $image->getClientOriginalExtension();
+            $name = 'product/images/' . $image->getClientOriginalName();
+
+            $target_dir    = "product/images/";
+            $target_file   = $target_dir . basename($_FILES["image"]["name"]);
+
+            $product->image = $target_file;
+
+            if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                echo "File " . basename($_FILES["image"]["name"]) .
+                " Đã upload thành công.";
+
+                echo "File lưu tại " .
+                $target_file;
+            }
+            $product->image = $name;
         }
-        $jsonSetting = new ProductResource($response);
-        return $jsonSetting;
+        $product->save();
     }
 
     /**
@@ -178,20 +199,39 @@ class ProductController extends Controller
         return  $jsonSetting;
     }
 
-    public function productLists() {
+    public function productLists(Request $request) {
 
-        $data = Product::with(['size','color'])->get();
+        // $data = Product::with(['size','color'])->get();
 
-        return response()-> json($data);
+        // return response()-> json($data);
+
+        $params = $request->all();
+        $params['conditions'] = $request->all();
+
+        $products = $this->productRepository->search($params);
+        $jsonProducts = ProductResource::collection($products);
+
+        return $jsonProducts;
 
     }
 
     public function productShow($id)
     {
 
-        $data = Product::with(['size', 'color'])->where('id', $id)->get();
+        // $data = Product::with(['size', 'color'])->where('id', $id)->get();
 
-        return response()->json($data);
+        // return response()->json($data);
+
+        try {
+            $product = $this->productRepository->findOrFail($id);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'data' => ['errors' => ['exception' => $th->getMessage()]]
+            ], 400);
+        }
+        $jsonBrand = new ProductResource($product);
+
+        return $jsonBrand;
     }
 
     public function productByCategory($id)
@@ -218,26 +258,26 @@ class ProductController extends Controller
         return response()->json($data);
     }
 
-    // public function upload(Request $request)
-    // {
+    public function upload(Request $request)
+    {
 
-    //     $request->validate([
-    //         'file' => 'required|mimes:jpg,jpeg,png,csv,txt,xlx,xls,pdf|max:2048'
-    //     ]);
+        $request->validate([
+            'file' => 'required|mimes:jpg,jpeg,png,csv,txt,xlx,xls,pdf|max:2048'
+        ]);
 
-    //     $fileUpload = new Product;
+        $fileUpload = new Product;
 
-    //     if ($request->file()) {
-    //         $file_name = time() . '_' . $request->file->getClientOriginalName();
-    //         $file_path = $request->file('file')->storeAs('uploads', $file_name, 'public');
+        if ($request->file()) {
+            $file_name = time() . '_' . $request->file->getClientOriginalName();
+            $file_path = $request->file('file')->storeAs('uploads', $file_name, 'public');
 
-    //         $fileUpload->name = time() . '_' . $request->file->getClientOriginalName();
-    //         $fileUpload->path = '/storage/' . $file_path;
-    //         $fileUpload->save();
+            $fileUpload->name = time() . '_' . $request->file->getClientOriginalName();
+            $fileUpload->path = '/storage/' . $file_path;
+            $fileUpload->save();
 
-    //         return response()->json(['success' => 'File uploaded successfully.']);
-    //     }
-    // }
+            return response()->json(['success' => 'File uploaded successfully.']);
+        }
+    }
 
 
 }

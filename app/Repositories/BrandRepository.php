@@ -38,8 +38,9 @@ class BrandRepository extends BaseRepository
             $conditionsFormated[] = ['status', '=', (int) $conditions['status']];
         }
         $params['sortBy'] = 'id';
-        $params['sortType'] =  'asc';
+        $params['sortType'] =  'desc';
         $this->orderBy($params['sortBy'], $params['sortType']);
+        $params['limit'] = 5;
         $params['conditions'] = $conditionsFormated;
         $result = $this->searchByParams($params);
 

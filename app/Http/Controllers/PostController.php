@@ -2,15 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\PostRequest;
-use App\Http\Resources\PostResource;
-use App\Models\Post;
 use App\Repositories\PostRepository;
+use App\Http\Resources\PostResource;
+use App\Http\Requests\PostRequest;
+use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Http\File;
+use Illuminate\Support\Facades\Storage;
+use Carbon\Carbon;
 
 class PostController extends Controller
 {
-    protected $postRepository;
+    /**
+     * @var Repository
+     */
+    protected $brandRepository;
 
     /**
      * Construct
@@ -21,8 +27,9 @@ class PostController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Find data by multiple fields.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request  $request)
@@ -30,118 +37,79 @@ class PostController extends Controller
         $params = $request->all();
         $params['conditions'] = $request->all();
 
-        try {
-            $response = $this->postRepository->search($params);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'data' => ['errors' => ['exception' => $th->getMessage()]]
-            ], 400);
-        }
-        $jsonSetting = PostResource::collection($response);
+        $posts = $this->postRepository->search($params);
+        $jsonPosts = PostResource::collection($posts);
 
-        return  $jsonSetting;
+        return $jsonPosts;
     }
 
+    // /**
+    //  * Get list category with status = 1
+    //  *
+    //  * @param  \Illuminate\Http\Request  $request
+    //  * @return \Illuminate\Http\Response
+    //  */
+    // public function listPost(Request  $request)
+    // {
+    //     $params = $request->all();
+    //     $params['conditions'] = $request->all();
+    //     $params['conditions']['status'] = Brand::BRAND_ENABLED;
+
+    //     $brands = $this->brandRepository->search($params);
+    //     $jsonBrands = BrandResource::collection($brands);
+
+    //     return $jsonBrands;
+    // }
+
     /**
-     * Get list post with status = 1
+     * Store a newly created resource in storage.
      *
+     * @param  \App\Http\Requests\Category\CategoryRequest  $request
      * @return \Illuminate\Http\Response
      */
-    public function listPost(Request  $request)
-    {
-        $params = $request->all();
-        $params['conditions'] = $request->all();
-        $params['conditions']['status'] = Post::STATUS_POST_ENABLED;
-        $params['isContent'] = true;
-        try {
-            $response = $this->postRepository->search($params);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'data' => ['errors' => ['exception' => $th->getMessage()]]
-            ], 400);
-        }
-        $jsonSetting = PostResource::collection($response);
-        return  $jsonSetting;
-    }
+    // public function store(BrandRequest $request)
+    // {
+    //     $brand = $this->brandRepository->create($request->all());
+    //     $jsonBrand= new BrandResource($brand);
 
-    /**
-     * Get list post popular
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getListPopular(Request $request)
-    {
-        $params = $request->all();
-        $params['conditions'] = $request->all();
-        $params['conditions']['status'] = Post::STATUS_POST_ENABLED;
-        try {
-            $response = $this->postRepository->getListPopular($params);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'data' => ['errors' => ['exception' => $th->getMessage()]]
-            ], 400);
-        }
-        $jsonSetting = PostResource::collection($response);
-        return $jsonSetting;
-    }
+    //     return $jsonBrand;
+    // }
 
-    /**
-     * Get list post new
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getListNew(Request $request)
-    {
-        $params = $request->all();
-        $params['conditions'] = $request->all();
-        $params['conditions']['status'] = Post::STATUS_POST_ENABLED;
-        try {
-            $response = $this->postRepository->getListNew($params);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'data' => ['errors' => ['exception' => $th->getMessage()]]
-            ], 400);
-        }
-        $jsonSetting = PostResource::collection($response);
-        return $jsonSetting;
-    }
-
-    /**
-     * Get list post radom
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getListRadom()
-    {
-        try {
-            $response = $this->postRepository->getListRadom();
-        } catch (\Throwable $th) {
-            return response()->json([
-                'data' => ['errors' => ['exception' => $th->getMessage()]]
-            ], 400);
-        }
-        $jsonSetting = PostResource::collection($response);
-        return $jsonSetting;
-    }
-
-    /**
-     * Store post
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function store(PostRequest $request)
     {
-        try {
-            $response = $this->postRepository->store($request->all());
-        } catch (\Throwable $th) {
-            return response()->json([
-                'data' => ['errors' => ['exception' => $th->getMessage()]]
-            ], 400);
+        $post = new Post;
+        $post->title = $request->title;
+        $post->content = $request->content;
+        $post->public_start_at = $request->public_start_at;
+        $post->public_end_at = $request->public_end_at;
+        $post->description = $request->description;
+        $post->status = $request->status;
+        if ($request->image) {
+            $image = $request->image;
+            $extension = $image->getClientOriginalExtension();
+            $name = 'post/images/' . $image->getClientOriginalName();
+
+            $target_dir    = "post/images/";
+            $target_file   = $target_dir . basename($_FILES["image"]["name"]);
+
+            $post->image = $target_file;
+
+            if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                echo "File " . basename($_FILES["image"]["name"]) .
+                    " Đã upload thành công.";
+
+                echo "File lưu tại " .
+                    $target_file;
+            }
+
+
+            $post->image = $name;
+        } else {
+            $post->image = 'defaul.jpg';
         }
-        $jsonSetting = new PostResource($response);
-        return $jsonSetting;
+        $post->save();
     }
+
 
     /**
      * Display the specified resource.
@@ -152,35 +120,56 @@ class PostController extends Controller
     public function show($id)
     {
         try {
-            $response  = $this->postRepository->findOrFail($id);
+            $post = $this->postRepository->findOrFail($id);
         } catch (\Throwable $th) {
             return response()->json([
                 'data' => ['errors' => ['exception' => $th->getMessage()]]
             ], 400);
         }
-        $jsonSetting = new PostResource($response);
-        return $jsonSetting;
+        $jsonPost = new PostResource($post);
+
+        return $jsonPost;
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  App\Http\Requests\Thing\SettingRequest  $request
+     * @param  App\Http\Requests\Category\CategoryRequest  $request
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(PostRequest $request, $id)
+    public function update(Request $request, $id)
     {
-        try {
-            $response = $this->postRepository->updatePost($request->all(), $id);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'data' => ['errors' => ['exception' => $th->getMessage()]]
-            ], 400);
+        $post = Post::find($id);
+        $post->title = $request->title;
+        $post->content = $request->content;
+        $post->public_start_at = $request->public_start_at;
+        $post->public_end_at = $request->public_end_at;
+        $post->description = $request->description;
+        $post->status = $request->status;
+        if ($request->image) {
+            $image = $request->image;
+            $extension = $image->getClientOriginalExtension();
+            $name = 'post/images/' . $image->getClientOriginalName();
+
+            $target_dir    = "post/images/";
+            $target_file   = $target_dir . basename($_FILES["image"]["name"]);
+
+            $post->image = $target_file;
+
+            if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_file)) {
+                echo "File " . basename($_FILES["image"]["name"]) .
+                    " Đã upload thành công.";
+
+                echo "File lưu tại " .
+                    $target_file;
+            }
+
+            $post->image = $name;
         }
-        $jsonSetting = new PostResource($response);
-        return $jsonSetting;
+        $post->save();
     }
+
 
     /**
      * Update Status.
@@ -192,15 +181,15 @@ class PostController extends Controller
     public function updateStatus(Request $request, $id)
     {
         try {
-            $response = $this->postRepository->update($request->only('status'), $id);
+            $post = $this->postRepository->update($request->only('status'), $id);
         } catch (\Throwable $th) {
             return response()->json([
                 'data' => ['errors' => ['exception' => $th->getMessage()]]
             ], 400);
         }
-        $jsonSetting = new PostResource($response);
+        $jsonPost= new PostResource($post);
 
-        return $jsonSetting;
+        return $jsonPost;
     }
 
     /**
@@ -212,13 +201,13 @@ class PostController extends Controller
     public function destroy($id)
     {
         try {
-            $response  = $this->postRepository->delete($id);
+            $result = $this->postRepository->delete($id);
         } catch (\Throwable $th) {
             return response()->json([
                 'data' => ['errors' => ['exception' => $th->getMessage()]]
             ], 400);
         }
 
-        return response($response);
+        return response($result);
     }
 }
