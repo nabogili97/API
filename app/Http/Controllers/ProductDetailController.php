@@ -50,11 +50,10 @@ class ProductDetailController extends Controller
     {
         $params = $request->all();
         $params['conditions'] = $request->all();
-
         $productDetails = $this->productDetailRepository->search($params);
-        $jsonColors = ProductDetailResource::collection($productDetails);
+        $jsonProductDetails = ProductDetailResource::collection($productDetails);
 
-        return $jsonColors;
+        return $jsonProductDetails;
     }
 
     /**
@@ -65,10 +64,12 @@ class ProductDetailController extends Controller
      */
     public function store(ProductDetailRequest $request)
     {
-        $productDetail = $this->colorRepository->create($request->all());
+
+        $productDetail = $this->productDetailRepository->create($request->all());
         $jsonProductDetail = new ProductDetailResource($productDetail);
 
         return $jsonProductDetail;
+
     }
 
     /**

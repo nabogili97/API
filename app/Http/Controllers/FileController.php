@@ -31,10 +31,10 @@ class FileController extends Controller
             $fileUpload->name = $request->name;
             $fileUpload->brand_id = $request->brand_id;
             $fileUpload->price = $request->price;
+            $fileUpload->discount = $request->discount;
             $fileUpload->retail_price = $request->retail_price;
             $fileUpload->description = $request->description;
             $fileUpload->content = $request->content;
-            $fileUpload->qty = $request->qty;
             $fileUpload->status = $request->status;
 
             $target_dir    = "product/images/";

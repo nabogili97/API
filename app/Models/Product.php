@@ -21,11 +21,11 @@ class Product extends Model
         "brand_id",
         "name",
         "content",
+        "discount",
         "description",
         "retail_price",
         "image",
         "price",
-        "qty",
         "status",
     ];
 
@@ -34,10 +34,10 @@ class Product extends Model
         return $this->belongsToMany('\App\Models\Size', 'product_details', 'product_id', 'size_id' );
     }
 
-    public function color()
-    {
-        return $this->belongsToMany('\App\Models\Color', 'product_details', 'product_id', 'color_id');
-    }
+    // public function color()
+    // {
+    //     return $this->belongsToMany('\App\Models\Color', 'product_details', 'product_id', 'color_id');
+    // }
 
     public function categories()
     {

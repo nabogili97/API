@@ -22,11 +22,11 @@ class CreateProductsTable extends Migration
             ->onDelete('cascade');
 
             $table->integer('brand_id');
+            $table->float('discount');
             $table->string('name');
             $table->integer('price');
             $table->integer('retail_price');
             $table->string('image');
-            $table->integer('qty');
             $table->string('description', 3000);
             $table->text('content');
             $table->tinyInteger('status');

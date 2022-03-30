@@ -34,6 +34,10 @@ class OrderRepository extends BaseRepository
             $conditionsFormated[] = ['product_id', 'like', '%' . $params['product_id'] . '%'];
         }
 
+        if (isset($conditions['user_id'])) {
+            $conditionsFormated[] = ['user_id', 'like', '%' . $params['user_id'] . '%'];
+        }
+
         $params['sortBy'] = 'id';
         $params['sortType'] =  'asc';
         $this->orderBy($params['sortBy'], $params['sortType']);

@@ -18,13 +18,13 @@ class ProductResource extends JsonResource
             'id' => $this->resource->id,
             'category_id' => $this->category_id,
             'brand_id' => $this->brand_id,
+            'discount' => $this->discount,
             'name' => $this->name,
             'content' => $this->content,
             'description' => $this->description,
             'price' => $this->price,
             'retail_price' => $this->retail_price,
             'image' => $this->image,
-            'qty' => $this->qty,
             'status' => $this->status
         ];
     }

@@ -14,18 +14,16 @@ class ProductDetail extends Model
     protected $fillable = [
         'product_id',
         'size_id',
-        'color_id',
-        'sku',
         'qty'
     ];
 
-    public function color()
-    {
-        return $this->hasMany(\App\Models\Color::class, 'color_id', 'id');
-    }
+    // public function color()
+    // {
+    //     return $this->hasMany(\App\Models\Color::class, 'color_id', 'id');
+    // }
 
     public function size()
     {
-        return $this->hasMany(\App\Models\Size::class, 'size_id', 'id');
+        return $this->hasMany(\App\Models\Size::class, 'id', 'size_id');
     }
 }

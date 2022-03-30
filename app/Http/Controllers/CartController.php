@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\ProductDetail;
 use App\Models\Order;
 use App\Models\Payment;
+use App\Http\Requests\execPostRequest;
 use App\Models\User;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
@@ -22,7 +24,7 @@ class CartController extends Controller
     public function addToCart(Request $request)
     {
 
-        $product = Product::find($request->get('product_id'));
+        $product = Product::with(['size'])->find($request->get('product_id'));
 
         $productFoundInCart =  Order::where('product_id', $request->get('product_id'))->pluck('id');
 
@@ -36,13 +38,13 @@ class CartController extends Controller
             ];
         }
 
-        // return $userItems;
        if($productFoundInCart->isEmpty())
        {
             $cart = Order::create([
                 'product_id' => $product->id,
                 'quantity' => 1,
-                'price' => $product->retail_price,
+                'size_id'=> $request->get('size_id'),
+                'price' => ($product->retail_price - ($product->retail_price * $product->discount)/100),
                 'user_id' => $request->get('user_id'),
             ]);
        } 
@@ -64,101 +66,6 @@ class CartController extends Controller
         return $product;
        
     }
-
-    public function cart(Request $request)
-    {
-        $orderList = array();
-        foreach ($request->all() as $row) {
-            $product = array();
-            $product['id'] = $row['id'];
-            $product['name'] = $row['name'];
-            $product['image'] = $row['image'];
-            $product['price'] = $row['price'];
-            $product['slmua'] = $row['slmua'];
-            $product['masp'] = $row['masp'];
-            array_push($orderList, $product);
-        }
-        $request->session()->forget('danhsach');
-        $request->session()->put('danhsach', $orderList);
-        return response()->json($orderList);
-
-    }
-
-    // public function updateCart(Request $request)
-    // {
-    //     Order::update(
-    //         $request->id,
-    //         [
-    //             'quantity' => [
-    //                 'relative' => false,
-    //                 'value' => $request->quantity
-    //             ],
-    //         ]
-    //     );
-
-    //     session()->flash('success', 'Item Cart is Updated Successfully !');
-
-    //     return redirect()->route('cart.list');
-    // }
-
-
-    public function removeCart(Request $request)
-    {
-        Order::remove($request->id);
-        session()->flash('success', 'Item Cart Remove Successfully !');
-
-        return redirect()->route('cart.list');
-    }
-
-    public function clearAllCart()
-    {
-        Order::clear();
-
-        session()->flash('success', 'All Item Cart Clear Successfully !');
-
-        return redirect()->route('cart.list');
-    }
-
-    public function store(Request $request)
-    {
-
-        $userItems = Order::where('user_id', auth()->id)->sum('quantity');
-
-        $product = Product::find($request->input('product_id'));
-
-        if (!$product) {
-            return response()->json(['success' => 0, 'message' => 'Product not found'], 404);
-        }
-
-        if ($product->amount == 0) {
-            return response()->json(['success' => 0, 'message' => 'Product has no more available items'], 500);
-        }
-
-        if ($product->amount < $request->input('amount')) {
-            return response()->json(['success' => 0, 'message' => 'There are only ' . $product->amount . ' available items of this product'], 500);
-        }
-
-        $user = Auth::user();
-
-        $cartItem = new Order();
-        $cartItem->user_id = $user->id;
-        $cartItem->product_id = $request->input('product_id');
-        $cartItem->amount = $request->input('amount');
-        $cartItem->save();
-
-        // update product amount
-        $product->decrement('amount', $request->input('amount'));
-
-        $cartItem = Order::with('product')->where('user_id', $user->id)->where('product_id', $request->input('product_id'))->first();
-
-        return response()->json(['success' => 1, 'message' => 'Item added successfully to the cart', 'item' => $cartItem], 200);
-    }
-
-    // public function index()
-    // {
-    //     $cart = ShoppingCart::with('product')->where('user_id', $user->id)->get();
-    //     return response()->json(['cart' => $cart], 200);
-    // }
 
     public function getCartItemsForCheckout(Request $request) 
     {   
@@ -182,13 +89,15 @@ class CartController extends Controller
                     {
                         if($cartProduct->id == $cartItem->product_id)
                         {
-                            $finalData[$cartItem->product_id]['id'] = $cartProduct->id;
+                            $finalData[$cartItem->product_id]['id'] = $cartItem->id;
                             $finalData[$cartItem->product_id]['img'] = $cartProduct->image;
                             $finalData[$cartItem->product_id]['name'] = $cartProduct->name;
+                            $finalData[$cartItem->product_id]['size_id'] = $cartItem->size_id;
                             $finalData[$cartItem->product_id]['retail_price'] = $cartItem->price;
+                            $finalData[$cartItem->product_id]['discount'] = $cartItem->discount;
                             $finalData[$cartItem->product_id]['quantity'] = $cartItem->quantity;
                             $finalData[$cartItem->product_id]['total'] = $cartItem->price * $cartItem->quantity;
-                            $amount +=  $cartItem->price * $cartItem->quantity;
+                            $amount +=  ($cartItem->price - ($cartItem->price* $cartItem->discount)/100 ) * $cartItem->quantity;
                             $finalData['totalAmount'] =  $amount;
                         }
                     }
@@ -249,5 +158,73 @@ class CartController extends Controller
         }
         return response($result);
     }
-    
+
+    public function execPostRequest($url, $data)
+    {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt(
+            $ch,
+            CURLOPT_HTTPHEADER,
+            array(
+                'Content-Type: application/json',
+                'Content-Length: ' . strlen($data)
+            )
+        );
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+        //execute post
+        $result = curl_exec($ch);
+        //close connection
+        curl_close($ch);
+        return $result;
+    }
+
+
+    public function momo_payment(Request $request) {
+
+        $endpoint = "https://test-payment.momo.vn/v2/gateway/api/create";
+
+
+        $partnerCode = 'MOMOBKUN20180529';
+        $accessKey = 'klm05TvNBzhg7h7j';
+        $serectkey = 'at67qH6mk8w5Y1nAyMoYKMWACiEi2bsa';
+
+        $orderInfo = "Thanh toán qua MoMo";
+        $amount = $request->get('amount');
+        $orderId = time() . "";
+        $redirectUrl = "http://localhost:3000/checkout";
+        $ipnUrl = "http://localhost:3000/checkout";
+        $extraData="";
+
+        $requestId = time() . "";
+        $requestType = "payWithATM";
+        //before sign HMAC SHA256 signature
+        $rawHash = "accessKey=" . $accessKey . "&amount=" . $amount . "&extraData=" . $extraData .  "&ipnUrl=" . $ipnUrl . "&orderId=" . $orderId . "&orderInfo=" . $orderInfo . "&partnerCode=" . $partnerCode . "&redirectUrl=" . $redirectUrl . "&requestId=" . $requestId . "&requestType=" . $requestType;
+        $signature = hash_hmac("sha256", $rawHash, $serectkey);
+       
+        $data = array(
+            'partnerCode' => $partnerCode,
+            'partnerName' => "Test",
+            "storeId" => "MomoTestStore",
+            'requestId' => $requestId,
+            'amount' => $amount,
+            'orderId' => $orderId,
+            'orderInfo' => $orderInfo,
+            'redirectUrl' => $redirectUrl,
+            'ipnUrl' => $ipnUrl,
+            'lang' => 'vi',
+            'requestType' => $requestType,
+            'signature' => $signature,
+            'extraData' => $extraData
+        );
+        $result = $this->execPostRequest($endpoint, json_encode($data));
+        $jsonResult = json_decode($result, true);  // decode json
+        
+        return  response($jsonResult['payUrl']);
+
+    }
 }
+

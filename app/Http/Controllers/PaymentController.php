@@ -40,6 +40,14 @@ class PaymentController extends Controller
         return $jsonPayments;
     }
 
+
+
+    public function orderLists()
+    {
+         $order = Payment::where('status', 3)->sum('amount');
+            return response()->json($order);
+    }
+
     /**
      * Get list category with status = 1
      *

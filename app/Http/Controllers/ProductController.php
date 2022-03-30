@@ -5,8 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Models\ProductDetail;
+use App\Models\Rating;
+use App\Http\Resources\RatingResource;
 use App\Repositories\ProductRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -49,6 +53,10 @@ class ProductController extends Controller
      */
     public function listProduct(Request  $request)
     {
+        // $data = Product::with(['size'])->get();
+
+        // return response()->json($data);
+
         $params = $request->all();
         $params['conditions'] = $request->all();
         $params['conditions']['status'] = Product::STATUS_PRODUCT_ENABLED;
@@ -62,6 +70,13 @@ class ProductController extends Controller
         }
         $jsonSetting = ProductResource::collection($response);
         return  $jsonSetting;
+    }
+
+    public function SaleProductList(Request  $request)
+    {
+        $data = DB::table('products')->where('discount', '>' , 0)->get();
+
+        return response()->json($data);
     }
 
     /**
@@ -89,16 +104,20 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
-        try {
-            $response  = $this->productRepository->findOrFail($id);
-        } catch (\Throwable $th) {
-            return response()->json([
-                'data' => ['errors' => ['exception' => $th->getMessage()]]
-            ], 400);
-        }
-        $jsonSetting = new ProductResource($response);
-        return $jsonSetting;
+    {   
+        $data = Product::with(['size'])->where('id', $id)->get();
+
+        return response()->json($data);
+
+        // try {
+        //     $response  = $this->productRepository->findOrFail($id);
+        // } catch (\Throwable $th) {
+        //     return response()->json([
+        //         'data' => ['errors' => ['exception' => $th->getMessage()]]
+        //     ], 400);
+        // }
+        // $jsonSetting = new ProductResource($response);
+        // return $jsonSetting;
     }
 
     /**
@@ -115,7 +134,7 @@ class ProductController extends Controller
         $product->category_id = $request->category_id;
         $product->brand_id = $request->brand_id;
         $product->price = $request->price;
-        $product->qty = $request->qty;
+        $product->discount = $request->discount;
         $product->retail_price = $request->retail_price;
         $product->description = $request->description;
         $product->content = $request->content;
@@ -218,7 +237,7 @@ class ProductController extends Controller
     public function productShow($id)
     {
 
-        // $data = Product::with(['size', 'color'])->where('id', $id)->get();
+        // $data = Product::with(['size'])->where('id', $id)->get();
 
         // return response()->json($data);
 
@@ -258,6 +277,21 @@ class ProductController extends Controller
         return response()->json($data);
     }
 
+    public function productBySize($id)
+    {
+        // $data = Product::with('size')->where('size', )->get();
+
+        // return response()->json($data);
+
+        $data = DB::table('product_details')->join('products', 'products.id', '=', 'product_details.product_id')
+        ->join('sizes', 'sizes.id', 'product_details.size_id')
+        ->select('product_details.*', 'products.*', 'sizes.*')
+        ->where('size_id', $id)
+        ->paginate(15);
+
+        return response()->json($data);
+    }
+
     public function upload(Request $request)
     {
 
@@ -277,6 +311,17 @@ class ProductController extends Controller
 
             return response()->json(['success' => 'File uploaded successfully.']);
         }
+    }
+
+    public function setrating(Request $request)
+    {
+        return new RatingResource(
+            Rating::create([
+                'product_id' => $request->get('product_id'),
+                'user_id' => $request->get('user_id'),
+                'rating' => $request->get('rating')
+            ])
+        );
     }
 
 

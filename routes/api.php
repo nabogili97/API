@@ -30,6 +30,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\RatingController;
 use Illuminate\Support\Facades\Auth;
 
 /*
@@ -136,6 +137,9 @@ Route::put('product/updateStatus/{id}', [ProductController::class, 'updateStatus
 Route::put('product/update/{id}', [ProductController::class, 'update']);
 Route::delete('product/destroy/{id}', [ProductController::class, 'destroy']);
 Route::get('product', [ProductController::class, 'index']);
+Route::get('product/sale-list', [ProductController::class, 'SaleProductList']);
+Route::get('productDetail/{id}', [ProductController::class, 'productShow']);
+
 
 // Route category
 Route::get('categories/listCategory', [CategoryController::class, 'listCategory']);
@@ -212,8 +216,8 @@ Route::get('productLists/category/{id}', [ProductController::class, 'productByCa
 Route::get( 'productLists/brand/{id}', [ProductController::class, 'productByBrand']);
 Route::get( 'productLists/color/{id}', [ProductController::class, 'productByColor']);
 Route::get('productShow/{id}', [ProductController::class, 'productShow']);
+Route::get('productLists/size/{id}', [ProductController::class, 'productBySize']);
 
-Route::get('product/show/{id}', [ProductController::class, 'productShow']);
 
 
 // Post
@@ -256,7 +260,10 @@ Route::get('purchase', [CustomerController::class, 'purchase']);
 
 
 //Order
-Route::get('orderList', [OrderController::class, 'listOrder']);
+Route::get('orderList', [PaymentController::class, 'index']);
+Route::put('cart/update/{id}', [OrderController::class, 'update']);
+Route::put('cart-product-qty-add/{id}', [OrderController::class, 'incQuantity']);
+Route::put('cart-product-qty-subtrac/{id}', [OrderController::class, 'subtracQuantity']);
 
 //Comment
 Route::post('comment/store', [CommentController::class, 'store']);
@@ -271,3 +278,21 @@ Route::get('payments', [PaymentController::class, 'index']);
 Route::put('payment/update/{id}', [PaymentController::class, 'update']);
 Route::delete('payment/destroy/{id}', [PaymentController::class, 'destroy']);
 Route::get('payment/show/{id}', [PaymentController::class, 'show']);
+
+
+//Rating
+Route::post('rating/store', [RatingController::class, 'store']);
+Route::get('ratings', [RatingController::class, 'getRating']);
+Route::get('rating-average', [RatingController::class, 'RatingAverage']);
+Route::get('ratings/lists', [RatingController::class, 'index']);
+Route::get('ratings-lists', [RatingController::class, 'list']);
+
+//Momo Payment
+Route::post('momo_payment', [CartController::class, 'momo_payment']);
+
+//Dasboard
+
+Route::get( 'amout-list', [PaymentController::class, 'orderLists']);
+Route::get( 'statistical', [DashboardController::class, 'statistical']);
+Route::get('dayList', [ DashboardController::class, 'dayList']);
+Route::get('orderStatus', [DashboardController::class, 'orderStatus']);

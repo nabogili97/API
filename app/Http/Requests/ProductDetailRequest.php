@@ -47,7 +47,6 @@ class ProductDetailRequest extends FormRequest
         return [
             'product_id' => 'required',
             'size_id' => 'required',
-            'color_id' => 'required',
             'qty' => 'required',
         ];
     }

@@ -3,9 +3,9 @@
 namespace App\Repositories;
 
 use App\Repositories\BaseRepository;
-use App\Models\Payment;
+use App\Models\Rating;
 
-class PaymentRepository extends BaseRepository
+class RatingRepository extends BaseRepository
 {
     /**
      * Specify Model class name
@@ -14,7 +14,7 @@ class PaymentRepository extends BaseRepository
      */
     public function model()
     {
-        return Payment::class;
+        return Rating::class;
     }
 
     /**
@@ -30,19 +30,25 @@ class PaymentRepository extends BaseRepository
         $conditions = $this->getSearchConditions($params);
         $conditionsFormated = [];
 
-        if (isset($conditions['name'])) {
-            $conditionsFormated[] = ['name', 'like', '%' . $params['name'] . '%'];
+        if (isset($conditions['rating'])) {
+            $conditionsFormated[] = ['rating', 'like', '%' . $params['rating'] . '%'];
         }
 
-        if (isset($conditions['phone'])) {
-            $conditionsFormated[] = ['phone', 'like', '%' . $params['phone'] . '%'];
+        if (isset($conditions['user_id'])) {
+            $conditionsFormated[] = ['user_id', 'like', '%' . $params['user_id'] . '%'];
         }
 
-        $params['conditions'] = $conditionsFormated;
+
+        if (isset($conditions['product_id'])) {
+            $conditionsFormated[] = ['product_id', 'like', '%' . $params['product_id'] . '%'];
+        }
+
+
         $params['sortBy'] = 'id';
         $params['sortType'] =  'desc';
         $this->orderBy($params['sortBy'], $params['sortType']);
-        $params['limit'] = 10;
+        $params['limit'] = 15;
+        $params['conditions'] = $conditionsFormated;
         $result = $this->searchByParams($params);
 
         return $result;

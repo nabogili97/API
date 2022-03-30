@@ -31,13 +31,16 @@ class CommentController extends Controller
      */
     public function list(Request  $request)
     {
-        $params = $request->all();
-        $params['conditions'] = $request->all();
+        // $params = $request->all();
+        // $params['conditions'] = $request->all();
 
-        $comments = $this->commentRepository->search($params);
-        $jsonComments = CommentResource::collection($comments);
+        // $comments = $this->commentRepository->search($params);
+        // $jsonComments = CommentResource::collection($comments);
 
-        return $jsonComments;
+        // return $jsonComments;
+
+        $comment = Comment::with('users')->get();
+        return response()->json($comment);
     }
 
     /**

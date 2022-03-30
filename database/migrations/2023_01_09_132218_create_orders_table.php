@@ -17,7 +17,14 @@ class CreateOrdersTable extends Migration
             $table->increments('id');
             $table->integer('quantity');
             $table->double('price');
-            
+
+            $table->integer('size_id')->unsigned();
+            $table->foreign('size_id')
+            ->references('id')
+            ->on('sizes')
+            ->onDelete('cascade');
+
+
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')
             ->references('id')

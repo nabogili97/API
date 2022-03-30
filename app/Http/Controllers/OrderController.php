@@ -14,7 +14,7 @@ class OrderController extends Controller
     /**
      * @var Repository
      */
-    protected $corderRepository;
+    protected $orderRepository;
 
     /**
      * Construct
@@ -133,5 +133,22 @@ class OrderController extends Controller
         }
 
         return response($result);
+    }
+
+
+    public function incQuantity($id)
+    {
+        $order = Order::findOrFail($id);
+        $order->quantity = $order->quantity + 1;
+        $order->save();
+    }
+
+    public function subtracQuantity($id)
+    {
+        $order = Order::findOrFail($id);
+        if($order->quantity > 0) {
+            $order->quantity = $order->quantity - 1;
+        }
+        $order->save();
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class OrderRequest  extends FormRequest
+class RatingRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -45,10 +45,9 @@ class OrderRequest  extends FormRequest
     public function rules()
     {
         return [
-            'user_id' => 'required',
-            'product_id' => 'required',
-            'price' => 'required',
-            'quantity' => 'required'
+            'user_id' => 'required|max:255',
+            'product_id' => 'required|max:255',
+            'rating' => 'required|max:255'
         ];
     }
 }

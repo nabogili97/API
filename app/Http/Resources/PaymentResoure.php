@@ -21,7 +21,8 @@ class PaymentResoure extends JsonResource
             'address' => $this->address,
             'order_details' => $this->order_details,
             'amount' => $this->amount,
-            'status' => $this->status
+            'status' => $this->status,
+            'created_at'=> $this->created_at,   
         ];
     }
 }

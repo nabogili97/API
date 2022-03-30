@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Comment extends Model
+class Rating extends Model
 {
     use HasFactory;
     const BRAND_ENABLED = 1;
@@ -18,12 +18,12 @@ class Comment extends Model
     protected $fillable = [
         'user_id',
         'product_id',
-        'comment',
+        'rating',
     ];
 
     public function users()
     {
-        return $this->belongsToMany('\App\Models\User','comments', 'user_id', 'id');
+        return $this->belongsToMany('\App\Models\User', 'comments', 'user_id', 'id');
     }
 
     public function products()

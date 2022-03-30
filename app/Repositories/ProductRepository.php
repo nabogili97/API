@@ -83,9 +83,9 @@ class ProductRepository extends BaseRepository
             "brand_id",
             "name",
             "description",
-            "qty",
             "viewed",
             "retail_price",
+            "discount",
             "image",
             "status",
         ];
