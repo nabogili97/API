@@ -65,10 +65,43 @@ class ProductDetailController extends Controller
     public function store(ProductDetailRequest $request)
     {
 
-        $productDetail = $this->productDetailRepository->create($request->all());
-        $jsonProductDetail = new ProductDetailResource($productDetail);
+        $product_id = $request->get('product_id');
+        $size_id = $request->get('size_id');
+        $qty = $request->get('qty');
 
-        return $jsonProductDetail;
+        $data = ProductDetail::where([
+            ['product_id', $product_id],
+            ['size_id', $size_id]
+        ])->get();
+
+        foreach ($data as $item) {
+            $product_id_data = $item->product_id;
+            $size_id_data = $item->size_id;
+            $qty_data = $item->qty;
+
+            if($product_id_data == $product_id && $size_id_data == $size_id)
+            {
+                $total = $qty_data + $qty;
+                ProductDetail::where([
+                    ['product_id', $product_id],
+                    ['size_id', $size_id]
+                ])
+                ->update(['qty' => $total]);
+            } else {
+                ProductDetail::create([
+                    'product_id' => $product_id,
+                    'size_id' => $size_id,
+                    'qty' => $qty,
+                ]);
+            }
+
+
+        }        
+
+        // $productDetail = $this->productDetailRepository->create($request->all());
+        // $jsonProductDetail = new ProductDetailResource($productDetail);
+
+        // return $jsonProductDetail;
 
     }
 

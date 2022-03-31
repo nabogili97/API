@@ -105,7 +105,8 @@ class ProductController extends Controller
      */
     public function show($id)
     {   
-        $data = Product::with(['size'])->where('id', $id)->get();
+
+        $data = Product::with(['size', 'productDetails'])->where('id', $id)->get();
 
         return response()->json($data);
 

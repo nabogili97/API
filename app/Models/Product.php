@@ -34,6 +34,11 @@ class Product extends Model
         return $this->belongsToMany('\App\Models\Size', 'product_details', 'product_id', 'size_id' );
     }
 
+    public function productDetails()
+    {
+        return $this->hasMany('\App\Models\ProductDetail');
+    }
+
     // public function color()
     // {
     //     return $this->belongsToMany('\App\Models\Color', 'product_details', 'product_id', 'color_id');

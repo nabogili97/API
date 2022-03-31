@@ -11,6 +11,7 @@ use App\Http\Requests\execPostRequest;
 use App\Models\User;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
@@ -38,6 +39,7 @@ class CartController extends Controller
             ];
         }
 
+
        if($productFoundInCart->isEmpty())
        {
             $cart = Order::create([
@@ -47,12 +49,26 @@ class CartController extends Controller
                 'price' => ($product->retail_price - ($product->retail_price * $product->discount)/100),
                 'user_id' => $request->get('user_id'),
             ]);
+
+            
+
        } 
        else 
        {
             $cart = Order::where('product_id', $request->get('product_id'))
             ->increment('quantity');
+
+            // $cart = Order::create([
+            //     'product_id' => $product->id,
+            //     'quantity' => 1,
+            //     'size_id' => $request->get('size_id'),
+            //     'price' => ($product->retail_price - ($product->retail_price * $product->discount) / 100),
+            //     'user_id' => $request->get('user_id'),
+            // ]);
        }
+
+       
+
 
        
 
@@ -76,7 +92,8 @@ class CartController extends Controller
         if(isset($cartItems))
         {
             foreach ($cartItems as  $cartItem) 
-            {   
+            {
+                
                 
                 if($cartItem->product)
                 {
@@ -87,6 +104,7 @@ class CartController extends Controller
 
                     foreach($cartItem->product as $cartProduct)
                     {
+
                         if($cartProduct->id == $cartItem->product_id)
                         {
                             $finalData[$cartItem->product_id]['id'] = $cartItem->id;
@@ -111,6 +129,7 @@ class CartController extends Controller
 
     public function payment(Request $request) 
     {
+
         $name = $request->get('name');
         $phone = $request->get('phone');
         $address = $request->get('address');
@@ -119,6 +138,36 @@ class CartController extends Controller
         $orders = $request->get('order');
         $user_id = 1;
         $status = 0;
+
+
+        $data = Order::where('user_id', $user_id)->get();
+
+        $count = Order::where('user_id', $user_id)->get()->count();
+        
+        foreach ($data as $pro) {
+            $product_id = $pro->product_id;
+            $size_id = $pro->size_id;
+            
+            $qtypro = ProductDetail::where([
+                ['product_id', $product_id], 
+                ['size_id', $size_id]
+            ])->get();
+
+            foreach ($qtypro as $quantity)
+            {
+               $product_quantity =  $quantity->qty;
+                $qty = $pro->quantity;
+
+                $soluong = $product_quantity - $qty;
+
+
+                ProductDetail::where([
+                    ['product_id', $product_id],
+                    ['size_id', $size_id]
+                ])
+                ->update(['qty' =>$soluong]);
+            }
+        }
 
         $paymentDetail = Payment::create([
             'user_id'=> $user_id,
@@ -135,7 +184,10 @@ class CartController extends Controller
         if( $paymentDetail )
         {
             Order::where('user_id', $user_id)->delete();
-        }
+            
+        }  
+
+        
 
         return response()->json($paymentDetail);
 
